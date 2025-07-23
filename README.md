@@ -1,22 +1,88 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AI Summarizer - PDF Summarization SaaS
 
-## Getting Started
+A powerful AI-powered PDF summarization tool built with Next.js, featuring document upload, AI analysis, and intelligent summarization capabilities.
 
-First, run the development server:
+## 🚀 Features
 
+- **AI-Powered Summarization**: Advanced Google Generative AI for document analysis
+- **User Authentication**: Secure authentication with Clerk
+- **Payment Integration**: PayPal subscription system for Pro plans
+- **Real-time Database**: Convex for real-time data synchronization
+- **Rich Text Editor**: TipTap editor for enhanced document interaction
+- **Responsive Design**: Modern UI with Tailwind CSS
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, Tailwind CSS
+- **Backend**: Convex (Serverless)
+- **AI**: Google Generative AI (Gemini)
+- **Authentication**: Clerk
+- **Payments**: PayPal
+- **Editor**: TipTap
+- **Deployment**: Vercel
+
+## 📦 Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/AryanSingh1112/Summarify--SAAS-AI-Powered-PDF-Summarizer.git
+cd ai-summarization
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+## 🚀 Deployment on Vercel
+
+### Step 1: Prepare Environment Variables
+
+Make sure to add these environment variables in your Vercel dashboard:
+
+```
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+CONVEX_DEPLOYMENT=dev:your-deployment-name
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_paypal_client_id
+NEXT_PUBLIC_PAYPAL_ENV=sandbox
+```
+
+### Step 2: Deploy
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add all environment variables in Vercel dashboard
+4. Deploy!
+
+## ⚠️ Important Notes
+
+- Make sure to get your Google AI API key from Google AI Studio
+- Set up Convex deployment before deploying to Vercel
+- Configure PayPal for payment processing
+- Update Clerk webhook URLs for production
+
+## 📁 Project Structure
+
+```
+├── app/                  # Next.js app directory
+├── components/          # Reusable components
+├── convex/             # Convex backend functions
+├── lib/                # Utility functions
+└── public/             # Static assets
+```
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 

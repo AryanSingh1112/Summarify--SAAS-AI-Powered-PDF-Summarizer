@@ -143,7 +143,7 @@ export const generateShortSummary = action({
         try {
             const vectorstore = new ConvexVectorStore(
                 new GoogleGenerativeAIEmbeddings({
-                    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+                    apiKey: 'AIzaSyBPN3yAR40Fx5fjniiQiRaCE2D3K-hHcuo',
                     model: "text-embedding-004",
                     taskType: TaskType.RETRIEVAL_DOCUMENT,
                     title: "Document title",
@@ -163,7 +163,7 @@ export const generateShortSummary = action({
             const documentContent = filteredResults.map(result => result.pageContent).join('\n\n');
 
             // Initialize Google Generative AI
-            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+            const genAI = new GoogleGenerativeAI('AIzaSyBPN3yAR40Fx5fjniiQiRaCE2D3K-hHcuo');
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
             const prompt = `You are an expert at creating concise, impactful summaries. Please read through the entire document content and create a brief but comprehensive summary that captures the essence of the document.
