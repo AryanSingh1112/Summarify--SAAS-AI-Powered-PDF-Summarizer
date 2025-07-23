@@ -1,12 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Optimize for production
-  swcMinify: true,
-  
-  // Enable experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-  },
+  // Server external packages (formerly experimental.serverComponentsExternalPackages)
+  serverExternalPackages: ['@google/generative-ai', '@langchain/community', '@langchain/core'],
   
   // Image optimization
   images: {
@@ -14,13 +9,7 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   
-  // Environment variables validation
-  env: {
-    CONVEX_DEPLOYMENT: process.env.CONVEX_DEPLOYMENT,
-    NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
-  },
-  
-  // Webpack optimization
+  // Webpack optimization for deployment
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -28,12 +17,25 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
+        crypto: false,
+        stream: false,
+        url: false,
+        zlib: false,
+        http: false,
+        https: false,
+        assert: false,
+        os: false,
+        path: false,
       };
     }
+    
+    // Handle external modules properly
+    config.externals = [...(config.externals || []), 'canvas', 'jsdom'];
+    
     return config;
   },
   
-  // Headers for security
+  // Security headers
   async headers() {
     return [
       {
