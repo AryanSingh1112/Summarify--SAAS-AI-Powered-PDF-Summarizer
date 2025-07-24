@@ -5,215 +5,129 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { TaskType } from "@google/generative-ai";
 import { v } from "convex/values";
 
+// INGEST PDF TEXT
 export const ingest = action({
-    args: {
-        splitText: v.any(),
-        fileId: v.string(),
-    },
-    handler: async (ctx, args) => {
-        await ConvexVectorStore.fromTexts(
-            args.splitText,
-            args.splitText.map(() => ({ fileId: args.fileId })), // ✅ this maps properly now
-            new GoogleGenerativeAIEmbeddings({
-                apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-                model: "text-embedding-004",
-                taskType: TaskType.RETRIEVAL_DOCUMENT,
-                title: "Document title",
-            }),
-            { ctx }
-        );
-
-        return "completed...";
-    },
+  args: {
+    splitText: v.any(),
+    fileId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ConvexVectorStore.fromTexts(
+      args.splitText,
+      args.splitText.map(() => ({ fileId: args.fileId })),
+      new GoogleGenerativeAIEmbeddings({
+        apiKey: process.env.GOOGLE_API_KEY,
+        model: "text-embedding-004",
+        taskType: TaskType.RETRIEVAL_DOCUMENT,
+        title: "Document title",
+      }),
+      { ctx }
+    );
+    return "Ingestion completed";
+  },
 });
 
+// SEMANTIC SEARCH
 export const search = action({
-    args:{
-        query: v.string(),
-        fileId: v.string()
-    },
+  args: {
+    query: v.string(),
+    fileId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const vectorstore = new ConvexVectorStore(
+      new GoogleGenerativeAIEmbeddings({
+        apiKey: process.env.GOOGLE_API_KEY,
+        model: "text-embedding-004",
+        taskType: TaskType.RETRIEVAL_DOCUMENT,
+        title: "Document title",
+      }),
+      { ctx }
+    );
 
-    handler: async (ctx,args)=>{
-        const vectorstore = new ConvexVectorStore(
-             new GoogleGenerativeAIEmbeddings({
-                apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-                model: "text-embedding-004",
-                taskType: TaskType.RETRIEVAL_DOCUMENT,
-                title: "Document title",
-            }),
-            {ctx}
-        );
-        const resultOne = await vectorstore.similaritySearch(args.query , 1);
-        const filteredResults = resultOne.filter(q=>q.metadata.fileId === args.fileId);
+    const resultOne = await vectorstore.similaritySearch(args.query, 1);
+    const filteredResults = resultOne.filter(
+      (q) => q.metadata.fileId === args.fileId
+    );
 
-        return JSON.stringify(filteredResults);
-    }
-})
-
-export const generateLongSummary = action({
-    args: {
-        fileId: v.string()
-    },
-    handler: async (ctx, args) => {
-        try {
-            const vectorstore = new ConvexVectorStore(
-                new GoogleGenerativeAIEmbeddings({
-                    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-                    model: "text-embedding-004",
-                    taskType: TaskType.RETRIEVAL_DOCUMENT,
-                    title: "Document title",
-                }),
-                { ctx }
-            );
-
-            // Get ALL content chunks from the document (much more comprehensive)
-            const results = await vectorstore.similaritySearch("document text content information data", 50);
-            const filteredResults = results.filter(q => q.metadata.fileId === args.fileId);
-
-            if (filteredResults.length === 0) {
-                return "No content found for this document.";
-            }
-
-            // Combine ALL available content from the document
-            const documentContent = filteredResults.map(result => result.pageContent).join('\n\n');
-
-            // Initialize Google Generative AI
-            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-            const prompt = `You are an expert document analyst. Please read through the entire document content below and create a comprehensive, well-structured, and beautifully formatted summary.
-
-Please provide:
-
-## 📄 COMPREHENSIVE DOCUMENT ANALYSIS
-
-### 🎯 Document Overview
-- Brief description of what this document is about
-- Type of document (research paper, report, manual, etc.)
-- Main subject area or field
-
-### 📋 Key Information
-- Primary objectives or goals
-- Main topics covered
-- Important findings or conclusions
-- Critical data, statistics, or evidence presented
-
-### 🔍 Detailed Analysis
-- Methodology or approach used (if applicable)
-- Major sections and their content
-- Significant insights or discoveries
-- Any recommendations or action items
-
-### 💡 Key Takeaways
-- Most important points readers should remember
-- Practical implications or applications
-- Future considerations or next steps
-
-### 📊 Summary Highlights
-- Notable quotes or statements
-- Important numbers, dates, or metrics
-- Conclusions and final thoughts
-
-Please make the summary engaging, informative, and easy to read. Use clear headings and bullet points where appropriate.
-
----
-
-DOCUMENT CONTENT:
-${documentContent}
-
----
-
-Please provide a comprehensive and beautifully formatted analysis:`;
-
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return response.text();
-
-        } catch (error) {
-            return "Error generating summary. Please try again.";
-        }
-    }
+    return JSON.stringify(filteredResults);
+  },
 });
 
-export const generateShortSummary = action({
-    args: {
-        fileId: v.string()
-    },
-    handler: async (ctx, args) => {
-        try {
-            const vectorstore = new ConvexVectorStore(
-                new GoogleGenerativeAIEmbeddings({
-                    apiKey: 'AIzaSyBPN3yAR40Fx5fjniiQiRaCE2D3K-hHcuo',
-                    model: "text-embedding-004",
-                    taskType: TaskType.RETRIEVAL_DOCUMENT,
-                    title: "Document title",
-                }),
-                { ctx }
-            );
+// GENERATE LONG SUMMARY
+export const generateLongSummary = internalAction({
+  args: { fileId: v.id("files") },
+  handler: async (ctx, { fileId }) => {
+    const file = await ctx.runQuery(api.files.getFileContent, { fileId });
 
-            // Get substantial content for quality brief summary (more than before)
-            const results = await vectorstore.similaritySearch("main content overview summary document", 25);
-            const filteredResults = results.filter(q => q.metadata.fileId === args.fileId);
+    if (!file || !file.content) throw new Error("File content not found");
 
-            if (filteredResults.length === 0) {
-                return "No content found for this document.";
-            }
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-            // Combine substantial content for better analysis
-            const documentContent = filteredResults.map(result => result.pageContent).join('\n\n');
+    const prompt = `
+You are a world-class AI summarizer.
 
-            // Initialize Google Generative AI
-            const genAI = new GoogleGenerativeAI('AIzaSyBPN3yAR40Fx5fjniiQiRaCE2D3K-hHcuo');
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+Your task is to write a detailed and structured **long-form summary** of the document provided below.
 
-            const prompt = `You are an expert at creating concise, impactful summaries. Please read through the entire document content and create a brief but comprehensive summary that captures the essence of the document.
+Requirements:
+- Use **5 to 8 paragraphs** of well-structured, natural-sounding language.
+- Capture the **full scope and logic** of the document.
+- Group similar ideas into sections where appropriate.
+- You may use headings like **"Overview"**, **"Main Arguments"**, or **"Conclusion"** to organize the content.
+- Write in a clear, human-like tone that is **insightful and pleasant to read**.
 
-Please provide:
+Here is the document:
+"""
+${file.content}
+"""`;
 
-
-### 🎯 What This Document Is About
-Write 2-3 sentences explaining the core purpose and subject of this document.
-
-### ⭐ Key Highlights
-- 4-5 most important points or findings
-- Critical information readers must know
-- Main conclusions or outcomes
-
-### 💼 Practical Impact
-- Why this document matters
-- Who should care about this information
-- Main takeaway for readers
-
-Please make it concise but informative - like a professional executive summary that busy people can read quickly to understand the essential points.
-
----
-
-DOCUMENT CONTENT:
-${documentContent}
-
----
-
-Please provide a well-formatted brief summary:`;
-
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return response.text();
-
-        } catch (error) {
-            return "Error generating summary. Please try again.";
-        }
-    }
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  },
 });
 
+export const generateShortSummary = internalAction({
+  args: { fileId: v.id("files") },
+  handler: async (ctx, { fileId }) => {
+    const file = await ctx.runQuery(api.files.getFileContent, { fileId });
+
+    if (!file || !file.content) throw new Error("File content not found");
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    const prompt = `
+You are an expert at condensing complex documents into digestible key points.
+
+Your task is to create a **short summary** of the document below in exactly **10 bullet points**.
+
+Each bullet point should be:
+- 1 to 2 lines long
+- Capture a key idea or insight
+- Written in clear, professional language
+
+Here is the document:
+"""
+${file.content}
+"""`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  },
+});
+
+
+// GET FILES
 export const GetUserFiles = query({
-    args:{
-        userEmail: v.string()
-    },
+  args: {
+    userEmail: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query("pdfFiles")
+      .filter((q) => q.eq(q.field("createdBy"), args.userEmail))
+      .collect();
 
-    handler:async(ctx,args)=>{
-        const result = await ctx.db.query("pdfFiles")
-        .filter((q) => q.eq(q.field("createdBy"), args.userEmail)).collect();
-
-        return JSON.stringify(result);
-    }
-})
+    return JSON.stringify(result);
+  },
+});

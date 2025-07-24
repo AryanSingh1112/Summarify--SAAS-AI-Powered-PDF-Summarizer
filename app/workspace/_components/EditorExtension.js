@@ -30,7 +30,7 @@ function EditorExtension({ editor }) {
         content: '',
         editorProps: {
             attributes: {
-                class: 'focus:outline-none p-4 prose prose-sm max-w-none min-h-[150px]'
+                class: 'focus:outline-none p-3 md:p-4 prose prose-sm md:prose-base max-w-none min-h-[120px] md:min-h-[150px] text-sm md:text-base'
             }
         },
         immediatelyRender: false,
@@ -120,50 +120,50 @@ function EditorExtension({ editor }) {
     return editor && (
         <div className="flex flex-col h-full">
             {/* Toolbar */}
-            <div className='p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200'>
-                <div className="flex justify-between items-center">
+            <div className='p-2 md:p-4 lg:p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200'>
+                <div className="flex flex-col space-y-3 lg:flex-row lg:justify-between lg:items-center lg:space-y-0">
                     {/* Text Formatting Controls */}
-                    <div className="flex items-center gap-1 bg-white rounded-lg p-2 shadow-sm">
+                    <div className="flex items-center gap-1 bg-white rounded-lg p-1.5 md:p-2 shadow-sm overflow-x-auto">
                         <button
                             onClick={() => getCurrentEditor()?.chain().focus().toggleBold().run()}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('bold')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('bold')
                                 ? 'bg-blue-500 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Bold"
                         >
-                            <BoldIcon className='w-5 h-5' />
+                            <BoldIcon className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
                         <button
                             onClick={() => getCurrentEditor()?.chain().focus().toggleItalic().run()}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('italic')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('italic')
                                 ? 'bg-blue-500 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Italic"
                         >
-                            <ItalicIcon className='w-5 h-5' />
+                            <ItalicIcon className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
 
                         <button
                             onClick={() => getCurrentEditor()?.chain().focus().toggleHighlight().run()}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('highlight')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('highlight')
                                 ? 'bg-yellow-400 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Highlight"
                         >
-                            <Highlighter className='w-5 h-5' />
+                            <Highlighter className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
                         <button
                             onClick={() => getCurrentEditor()?.chain().focus().toggleStrike().run()}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('strike')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('strike')
                                 ? 'bg-red-500 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Strikethrough"
                         >
-                            <Strikethrough className='w-5 h-5' />
+                            <Strikethrough className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
 
                         <button
@@ -175,40 +175,40 @@ function EditorExtension({ editor }) {
                                     currentEditor.chain().focus().toggleSubscript().run();
                                 }
                             }}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('subscript')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('subscript')
                                 ? 'bg-blue-500 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Subscript"
                         >
-                            <Subscript className='w-5 h-5' />
+                            <Subscript className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
 
                         <button
                             onClick={() => getCurrentEditor()?.chain().focus().toggleUnderline().run()}
-                            className={`p-2 rounded-md transition-all duration-200 ${getCurrentEditor()?.isActive('underline')
+                            className={`p-1.5 md:p-2 rounded-md transition-all duration-200 flex-shrink-0 ${getCurrentEditor()?.isActive('underline')
                                 ? 'bg-blue-500 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             title="Underline"
                         >
-                            <UnderlineIcon className='w-5 h-5' />
+                            <UnderlineIcon className='w-4 h-4 md:w-5 md:h-5' />
                         </button>
 
-                        <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                        <div className="w-px h-4 md:h-6 bg-gray-300 mx-1 md:mx-2"></div>
 
                        
                     </div>
 
                     {/* AI Summary Controls */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                         <button
                             onClick={() => onLongSummaryClick()}
                             disabled={isLoading}
-                            className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${summaryType === 'detailed' ? 'ring-2 ring-blue-300' : ''}`}
+                            className={`flex items-center justify-center gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base ${summaryType === 'detailed' ? 'ring-2 ring-blue-300' : ''}`}
                             title="Generate Detailed Summary"
                         >
-                            <FileTextIcon className='w-5 h-5' />
+                            <FileTextIcon className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' />
                             <span className="font-medium">
                                 {isLoading && summaryType === 'detailed' ? 'Generating...' : 'Detailed Summary'}
                             </span>
@@ -217,10 +217,10 @@ function EditorExtension({ editor }) {
                         <button
                             onClick={() => onShortSummaryClick()}
                             disabled={isLoading}
-                            className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${summaryType === 'brief' ? 'ring-2 ring-green-300' : ''}`}
+                            className={`flex items-center justify-center gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm md:text-base ${summaryType === 'brief' ? 'ring-2 ring-green-300' : ''}`}
                             title="Generate Brief Summary"
                         >
-                            <StickyNoteIcon className='w-5 h-5' />
+                            <StickyNoteIcon className='w-4 h-4 md:w-5 md:h-5 flex-shrink-0' />
                             <span className="font-medium">
                                 {isLoading && summaryType === 'brief' ? 'Generating...' : 'Brief Summary'}
                             </span>
@@ -232,21 +232,21 @@ function EditorExtension({ editor }) {
             {/* Summary Display Area */}
             {currentSummary && (
                 <div className="bg-white border-t border-gray-200 shadow-inner flex-shrink-0">
-                    <div className="flex justify-between items-center p-4 bg-gray-50 border-b border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-800">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 md:p-4 bg-gray-50 border-b border-gray-200 gap-2 sm:gap-0">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-800">
                             {summaryType === 'detailed' ? '📄 Detailed Summary' : '📋 Brief Summary'}
                         </h3>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 onClick={clearSummary}
-                                className="px-3 py-1 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition-colors"
+                                className="px-3 py-1 bg-gray-500 text-white text-xs md:text-sm rounded-md hover:bg-gray-600 transition-colors flex-1 sm:flex-none"
                             >
                                 ✕ Close
                             </button>
                         </div>
                     </div>
                     {/* Editable Summary Content */}
-                    <div className="bg-white">
+                    <div className="bg-white max-h-48 md:max-h-64 overflow-y-auto">
                         <EditorContent
                             editor={summaryEditor}
                             className={`${summaryType === 'detailed' ? 'max-h-96 overflow-y-auto' : ''}`}

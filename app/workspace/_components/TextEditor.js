@@ -27,7 +27,7 @@ function TextEditor() {
 
         editorProps: {
             attributes: {
-                class: 'focus:outline-none p-6 prose prose-lg max-w-none min-h-[calc(100vh-200px)]'
+                class: 'focus:outline-none p-3 md:p-6 prose prose-sm md:prose-lg max-w-none h-full overflow-y-auto text-sm md:text-base'
             }
         },
         // Don't render immediately on the server to avoid SSR issues

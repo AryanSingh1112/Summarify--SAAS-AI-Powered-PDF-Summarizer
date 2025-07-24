@@ -9,7 +9,7 @@ const outfit = Outfit({
 });
 
 export const metadata = {
-    title: "AI Summarization - PDF to Summary",
+    title: "SUMMARIFY - AI Powered PDF Summarizer",
     description: "Transform your PDFs into concise summaries with AI power",
 };
 
